@@ -116,7 +116,7 @@ class CorrectTemplateTests(TestCase):
         form_fields = {
             'text': forms.fields.CharField,
             'group': forms.fields.ChoiceField,
-            }
+        }
         for value, expected in form_fields.items():
             with self.subTest(value=value):
                 form_field = response.context.get('form').fields.get(value)
@@ -128,7 +128,7 @@ class CorrectTemplateTests(TestCase):
         form_fields = {
             'text': forms.fields.CharField,
             'group': forms.fields.ChoiceField,
-            }
+        }
         for value, expected in form_fields.items():
             with self.subTest(value=value):
                 form_field = response.context.get('form').fields.get(value)
@@ -203,6 +203,7 @@ class PaginatorViewsTest(TestCase):
             'posts:profile', kwargs={'username': 'auth'}) + '?page=2')
         self.assertEqual(len(response.context['page_obj']), 3)
 
+
 class PostExistTests(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -225,18 +226,18 @@ class PostExistTests(TestCase):
         self.authorized_client.force_login(self.user)
 
     def test_post_index_exist(self):
-        """URL-адрес использует соответствующий шаблон index."""
+        """Пост есть в index."""
         response = self.authorized_client.get(reverse('posts:index'))
-        self.assertEqual(self.post.text, 'Тестовая пост')
+        self.assertEqual(response.context['page_obj'][0].text, self.post.text)
 
     def test_post_group_exist(self):
-        """URL-адрес использует соответствующий шаблон group_list."""
+        """Пост есть в group_list."""
         response = self.authorized_client.get(reverse(
             'posts:group_list', kwargs={'slug': 'test-slug'}))
-        self.assertEqual(self.post.text, 'Тестовая пост')
+        self.assertEqual(response.context['group'].slug, self.group.slug)
 
     def test_post_profile_exist(self):
-        """URL-адрес использует соответствующий шаблон profile."""
+        """Пост есть в profile."""
         response = self.authorized_client.get(reverse(
             'posts:profile', kwargs={'username': 'auth'}))
-        self.assertEqual(self.post.text, 'Тестовая пост')
+        self.assertEqual(response.context['page_obj'][0].text, self.post.text)

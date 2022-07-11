@@ -25,7 +25,6 @@ class PostModelTest(TestCase):
             pub_date=datetime.datetime.now()
         )
 
-
     def test_models_have_correct_object_names(self):
         """Проверяем, что у моделей GROUP корректно работает __str__."""
         # group = PostModelTest.group

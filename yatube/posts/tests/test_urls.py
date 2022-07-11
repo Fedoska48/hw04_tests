@@ -5,6 +5,7 @@ from ..models import Post, Group
 
 User = get_user_model()
 
+
 class FirstAccess(TestCase):
     @classmethod
     def setUpClass(cls):
