@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  {{ post.text|truncatewords:25 }}
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <aside class="col-12 col-md-3">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          Дата публикации: {{ post.pub_date|date:"d E Y" }}
+        </li>
+            {% if post.group %}
+              <li class="list-group-item">
+              Группа:
+             <a href="{% url 'posts:group_list' post.group.slug %}">
+               {{ post.group }}
+               <a>
+              </li>
+              {% else %}
+              <li class="list-group-item">
+              Отсутствует группа
+              {% endif %}
+              </li>
+                <li class="list-group-item">
+                  Автор: {{ post.author }}
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                Всего постов автора: {{ post.author.posts.count }}
+              </li>
+          <li class="list-group-item">
+            <a href="{% url 'posts:profile' post.author.username %}">
+            все посты пользователя
+            </a>
+        </li>
+      </ul>
+    </aside>
+    <article class="col-12 col-md-9">
+      <p>
+        {{ post.text|linebreaks }}
+      </p>
+    </article>
+    {% if request.user == post.author %}
+    <div class="d-flex justify-content-end">
+      <a href="{% url 'posts:post_edit' post.pk %}">
+        <button type="submit" class="btn btn-primary" value="Submit">
+          Редактировать
+        </button>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}
