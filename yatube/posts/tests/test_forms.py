@@ -23,7 +23,6 @@ class PostFormsTest(TestCase):
             group=cls.group,
         )
 
-
     def setUp(self):
         self.authorized_author = Client()
         self.authorized_author.force_login(self.author)
