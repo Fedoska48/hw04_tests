@@ -5,7 +5,7 @@
     Редактировать запись
   {% else %}
     Добавить запись
-  {% endif %}
+  {% endif %} <!--p> Не поместится в 79 символов, если вытянуть if-else-endif </p-->
 {% endblock %}
 
 {% block content %}
@@ -19,7 +19,7 @@
                 Редактировать запись
               {% else %}
                 Добавить запись
-              {% endif %}
+              {% endif %} <!--p> Не поместится в 79 символов, если вытянуть if-else-endif </p-->
             </div>
           <div class="card-body">
             {% include 'includes/error_check.html' %}

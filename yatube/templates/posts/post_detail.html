@@ -42,11 +42,11 @@
       </p>
     </article>
     {% if request.user == post.author %}
-    <div class="d-flex justify-content-end">
-      <a href="{% url 'posts:post_edit' post.pk %}">
-        <button type="submit" class="btn btn-primary" value="Submit">
-          Редактировать
-        </button>
+      <div class="d-flex justify-content-end">
+        <a href="{% url 'posts:post_edit' post.pk %}">
+          <button type="submit" class="btn btn-primary" value="Submit">
+            Редактировать
+          </button>
       </div>
     {% endif %}
   </div>

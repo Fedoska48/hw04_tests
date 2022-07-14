@@ -8,7 +8,12 @@ SECRET_KEY = '8$3x&ylq_3jx%yje@&j*r_2z^q0-+qmtrx+0#_p^u2npbcbol+'
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '[::1]',
+    'testserver',
+]
 
 
 INSTALLED_APPS = [
@@ -96,15 +101,10 @@ STATIC_URL = '/static/'
 
 SORT10 = 10
 
+SORT13 = 13
+
 LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'posts:index'
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
-
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '[::1]',
-    'testserver',
-]

@@ -1,5 +1,3 @@
-import datetime
-
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
@@ -22,7 +20,6 @@ class PostModelTest(TestCase):
             author=cls.user,
             text='Тестовая пост1234',
             group=cls.group,
-            pub_date=datetime.datetime.now()
         )
 
     def test_models_have_correct_object_names(self):
