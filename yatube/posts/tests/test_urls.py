@@ -98,7 +98,7 @@ class FirstAccess(TestCase):
     def test_urls_correct_templates(self):
         """Проверка корректности шаблонов"""
         templates_urls = (
-            ('posts:index', None,'posts/index.html'),
+            ('posts:index', None, 'posts/index.html'),
             ('posts:group_list', (self.group.slug,), 'posts/group_list.html'),
             ('posts:profile', (self.author,), 'posts/profile.html'),
             ('posts:post_detail', (self.post.id,), 'posts/post_detail.html'),
@@ -115,7 +115,7 @@ class FirstAccess(TestCase):
     def test_reverse_urls_correct(self):
         """Проверка доступнотси автору"""
         reverse_urls = (
-            ('posts:index', None,'/'),
+            ('posts:index', None, '/'),
             ('posts:group_list', ('testslug',), '/group/testslug/'),
             ('posts:profile', ('auth',), '/profile/auth/'),
             ('posts:post_detail', ('1',), '/posts/1/'),
