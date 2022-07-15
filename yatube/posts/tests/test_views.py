@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.forms import ModelForm
 from django.test import Client, TestCase
 from django.urls import reverse
 from django import forms
@@ -135,14 +134,18 @@ class CorrectTemplateTests(TestCase):
             slug='test-slug-new',
             description='Тестовое описание NEW',
         )
-        response = self.authorized_client.get(reverse(
+        response1 = self.authorized_client.get(reverse(
             'posts:group_list', args=(group2.slug,))
         )
-        self.assertEqual(len(response.context['page_obj']), settings.ZERO)
-        response = self.authorized_client.get(reverse(
+        response2 = self.authorized_client.get(reverse(
+            'posts:post_detail', args=(post1.id,))
+        )
+        response3 = self.authorized_client.get(reverse(
             'posts:group_list', args=(self.group.slug,))
         )
-        self.assertEqual(len(response.context['page_obj']), post_count + 1)
+        self.assertEqual(len(response1.context['page_obj']), settings.ZERO)
+        self.assertEqual(post1.group.slug, self.group.slug)
+        self.assertEqual(len(response3.context['page_obj']), post_count + 1)
 
 class PaginatorViewsTest(TestCase):
     @classmethod

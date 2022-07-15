@@ -49,12 +49,16 @@ class FirstAccess(TestCase):
                     self.assertEqual(response.status_code, 302)
                     rev_login = reverse('users:login')
                     rev_name = reverse('posts:post_create', None)
-                    self.assertRedirects(response, f'{rev_login}?next={rev_name}')
+                    self.assertRedirects(
+                        response, f'{rev_login}?next={rev_name}'
+                    )
                 elif address == 'posts:post_edit':
                     self.assertEqual(response.status_code, 302)
                     rev_login = reverse('users:login')
                     rev_name = reverse('posts:post_edit', args=(self.post.id,))
-                    self.assertRedirects(response, f'{rev_login}?next={rev_name}')
+                    self.assertRedirects(
+                        response, f'{rev_login}?next={rev_name}'
+                    )
                 else:
                     self.assertEqual(response.status_code, HTTPStatus.OK)
 
@@ -68,7 +72,9 @@ class FirstAccess(TestCase):
                 if address != 'posts:post_edit':
                     self.assertEqual(response.status_code, HTTPStatus.OK)
                 else:
-                    rev_detail = reverse('posts:post_detail', args=(self.post.id,))
+                    rev_detail = reverse(
+                        'posts:post_detail', args=(self.post.id,)
+                    )
                     self.assertRedirects(response, rev_detail)
 
     def test_author_access(self):
@@ -110,8 +116,9 @@ class FirstAccess(TestCase):
                                                       f'{self.group.slug}/')),
             ('posts:profile', (self.author,), f'/profile/{self.author}/'),
             ('posts:post_detail', (self.post.id,), f'/posts/{self.post.id}/'),
-            ('posts:post_create', None, f'/create/'),
-            ('posts:post_edit', (self.post.id,), f'/posts/{self.post.id}/edit/')
+            ('posts:post_create', None, '/create/'),
+            ('posts:post_edit', (self.post.id,), f'/posts/'
+                                                 f'{self.post.id}/edit/')
         )
         for address, args, links in reverse_urls:
             with self.subTest(address=address):
