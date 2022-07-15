@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from django.urls import reverse
@@ -12,78 +14,66 @@ class FirstAccess(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.user = User.objects.create_user(username='auth')
-        cls.author = User.objects.get(username='auth')
+        cls.author = User.objects.create_user(username='auth2')
+        # cls.author = User.objects.get(username='auth')
         cls.group = Group.objects.create(
             title='Тестовая группа123',
             slug='testslug',
             description='Тестовое описание123',
         )
         cls.post = Post.objects.create(
-            author=cls.user,
+            author=cls.author,
             text='Тестовая пост 1',
         )
 
     def setUp(self):
-        self.user = User.objects.create_user(username='john')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
         self.authorized_author = Client()
         self.authorized_author.force_login(self.author)
+        self.urls_template = (
+            ('posts:index', None),
+            ('posts:group_list', (self.group.slug,)),
+            ('posts:profile', (self.author,)),
+            ('posts:post_detail', (self.post.id,)),
+            ('posts:post_create', None),
+            ('posts:post_edit', (self.post.id,))
+        )
 
     def test_guest_access(self):
         """Доступность для гостя."""
-        urls_template = (
-            ('posts:index', None),
-            ('posts:group_list', (self.group.slug,)),
-            ('posts:profile', (self.author,)),
-            ('posts:post_detail', (self.post.id,)),
-            ('posts:post_create', None),
-            ('posts:post_edit', (self.post.id,))
-        )
-        for address, args in urls_template:
+        for address, args in self.urls_template:
             with self.subTest(address=address):
                 response = self.client.get(reverse(address, args=args))
-                if address == 'posts:post_create' or (address
-                                                      == 'posts:post_edit'):
-                    self.assertEqual(
-                        response.status_code, 302
-                    )
+                if address == 'posts:post_create':
+                    self.assertEqual(response.status_code, 302)
+                    rev_login = reverse('users:login')
+                    rev_name = reverse('posts:post_create', None)
+                    self.assertRedirects(response, f'{rev_login}?next={rev_name}')
+                elif address == 'posts:post_edit':
+                    self.assertEqual(response.status_code, 302)
+                    rev_login = reverse('users:login')
+                    rev_name = reverse('posts:post_edit', args=(self.post.id,))
+                    self.assertRedirects(response, f'{rev_login}?next={rev_name}')
                 else:
-                    self.assertEqual(response.status_code, 200)
+                    self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_user_access(self):
         """Доступность для пользователя."""
-        urls_template = (
-            ('posts:index', None),
-            ('posts:group_list', (self.group.slug,)),
-            ('posts:profile', (self.author,)),
-            ('posts:post_detail', (self.post.id,)),
-            ('posts:post_create', None),
-            ('posts:post_edit', (self.post.id,))
-        )
-        for address, args in urls_template:
+        for address, args in self.urls_template:
             with self.subTest(address=address):
                 response = self.authorized_client.get(
                     reverse(address, args=args)
                 )
-                if address == 'posts:post_edit':
-                    self.assertEqual(
-                        response.status_code, 302
-                    )
+                if address != 'posts:post_edit':
+                    self.assertEqual(response.status_code, HTTPStatus.OK)
                 else:
-                    self.assertEqual(response.status_code, 200)
+                    rev_detail = reverse('posts:post_detail', args=(self.post.id,))
+                    self.assertRedirects(response, rev_detail)
 
     def test_author_access(self):
         """Доступность для автора."""
-        urls_template = (
-            ('posts:index', None),
-            ('posts:group_list', (self.group.slug,)),
-            ('posts:profile', (self.author,)),
-            ('posts:post_detail', (self.post.id,)),
-            ('posts:post_create', None),
-            ('posts:post_edit', (self.post.id,))
-        )
-        for address, args in urls_template:
+        for address, args in self.urls_template:
             with self.subTest(address=address):
                 response = self.authorized_author.get(
                     reverse(address, args=args)
@@ -113,19 +103,16 @@ class FirstAccess(TestCase):
                 self.assertTemplateUsed(response, template)
 
     def test_reverse_urls_correct(self):
-        """Проверка доступнотси автору"""
+        """Корректность реверса"""
         reverse_urls = (
             ('posts:index', None, '/'),
-            ('posts:group_list', ('testslug',), '/group/testslug/'),
-            ('posts:profile', ('auth',), '/profile/auth/'),
-            ('posts:post_detail', ('1',), '/posts/1/'),
-            ('posts:post_create', None, '/create/'),
-            ('posts:post_edit', ('1',), '/posts/1/edit/')
+            ('posts:group_list', (self.group.slug,), (f'/group/'
+                                                      f'{self.group.slug}/')),
+            ('posts:profile', (self.author,), f'/profile/{self.author}/'),
+            ('posts:post_detail', (self.post.id,), f'/posts/{self.post.id}/'),
+            ('posts:post_create', None, f'/create/'),
+            ('posts:post_edit', (self.post.id,), f'/posts/{self.post.id}/edit/')
         )
         for address, args, links in reverse_urls:
             with self.subTest(address=address):
-                response1 = self.authorized_author.get(
-                    reverse(address, args=args)
-                )
-                response2 = self.authorized_author.get(links)
-                self.assertEqual(response1.request, response2.request)
+                self.assertEqual(reverse(address, args=args), links)

@@ -103,6 +103,8 @@ SORT10 = 10
 
 SORT13 = 13
 
+ZERO = 0
+
 LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'posts:index'
 
