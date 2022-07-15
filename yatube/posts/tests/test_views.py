@@ -138,14 +138,12 @@ class CorrectTemplateTests(TestCase):
             'posts:group_list', args=(group2.slug,))
         )
         response2 = self.authorized_client.get(reverse(
-            'posts:post_detail', args=(post1.id,))
-        )
-        response3 = self.authorized_client.get(reverse(
             'posts:group_list', args=(self.group.slug,))
         )
         self.assertEqual(len(response1.context['page_obj']), settings.ZERO)
         self.assertEqual(post1.group.slug, self.group.slug)
-        self.assertEqual(len(response3.context['page_obj']), post_count + 1)
+        self.assertEqual(len(response2.context['page_obj']), post_count + 1)
+
 
 class PaginatorViewsTest(TestCase):
     @classmethod
