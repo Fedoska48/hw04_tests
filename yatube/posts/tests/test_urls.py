@@ -46,24 +46,17 @@ class FirstAccess(TestCase):
             with self.subTest(address=address):
                 reverse_list = ['posts:post_create', 'posts:post_edit']
                 if address in reverse_list:
-                    response = self.client.get(reverse(address, args=args), follow=True)
+                    response = self.client.get(
+                        reverse(address, args=args), follow=True
+                    )
                     rev_login = reverse('users:login')
                     rev_name = reverse(address, args=args)
                     self.assertRedirects(
                         response, f'{rev_login}?next={rev_name}'
                     )
-
                 else:
                     response = self.client.get(reverse(address, args=args))
                     self.assertEqual(response.status_code, HTTPStatus.OK)
-                # elif address == 'posts:post_edit':
-                #     self.assertEqual(response.status_code, 302)
-                #     rev_login = reverse('users:login')
-                #     rev_name = reverse('posts:post_edit', args=(self.post.id,))
-                #     self.assertRedirects(
-                #         response, f'{rev_login}?next={rev_name}'
-                #     )
-
 
     def test_user_access(self):
         """Доступность для пользователя."""

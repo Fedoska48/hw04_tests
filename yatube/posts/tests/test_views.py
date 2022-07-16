@@ -33,30 +33,6 @@ class CorrectTemplateTests(TestCase):
         self.authorized_client.force_login(self.user)
         self.authorized_author = Client()
         self.authorized_author.force_login(self.author)
-        # self.template_check = (
-        #     ('posts:index', None),
-        #     ('posts:group_list', (self.group.slug,)),
-        #     ('posts:profile', (self.author,)),
-        #     ('posts:post_detail', (self.post.id,)),
-        # )
-
-    # def test_post_detail_pages_authorized_uses_correct_template(self):
-    #     """URL-адреса используют шаблон posts/post_detail.html."""
-    #     response = self.authorized_client.get(reverse(
-    #         'posts:post_detail', kwargs={'post_id': '1'})
-    #     )
-    #     self.assertTemplateUsed(response, 'posts/post_detail.html')
-    #
-    # def test_post_create_url_exists_at_desired_location(self):
-    #     """URL-адреса используют шаблон posts/create_post.html."""
-    #     response = self.authorized_client.get(reverse('posts:post_create'))
-    #     self.assertTemplateUsed(response, 'posts/create_post.html')
-    #
-    # def test_view_author_posts_edit(self):
-    #     """URL-адреса для автора используют шаблон posts/create_post.html."""
-    #     if self.authorized_client == self.user:
-    #         response = self.authorized_client.get(reverse('posts:post_edit'))
-    #         self.assertTemplateUsed(response, 'posts/create_post.html')
 
     def check_func(self, response, bol=False):
         """Вспомогательная функция для проверки корректного контекста"""
