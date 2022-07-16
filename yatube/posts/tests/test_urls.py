@@ -44,23 +44,26 @@ class FirstAccess(TestCase):
         """Доступность для гостя."""
         for address, args in self.urls_template:
             with self.subTest(address=address):
-                response = self.client.get(reverse(address, args=args))
-                if address == 'posts:post_create':
-                    self.assertEqual(response.status_code, 302)
+                reverse_list = ['posts:post_create', 'posts:post_edit']
+                if address in reverse_list:
+                    response = self.client.get(reverse(address, args=args), follow=True)
                     rev_login = reverse('users:login')
-                    rev_name = reverse('posts:post_create', None)
+                    rev_name = reverse(address, args=args)
                     self.assertRedirects(
                         response, f'{rev_login}?next={rev_name}'
                     )
-                elif address == 'posts:post_edit':
-                    self.assertEqual(response.status_code, 302)
-                    rev_login = reverse('users:login')
-                    rev_name = reverse('posts:post_edit', args=(self.post.id,))
-                    self.assertRedirects(
-                        response, f'{rev_login}?next={rev_name}'
-                    )
+
                 else:
+                    response = self.client.get(reverse(address, args=args))
                     self.assertEqual(response.status_code, HTTPStatus.OK)
+                # elif address == 'posts:post_edit':
+                #     self.assertEqual(response.status_code, 302)
+                #     rev_login = reverse('users:login')
+                #     rev_name = reverse('posts:post_edit', args=(self.post.id,))
+                #     self.assertRedirects(
+                #         response, f'{rev_login}?next={rev_name}'
+                #     )
+
 
     def test_user_access(self):
         """Доступность для пользователя."""
@@ -84,12 +87,12 @@ class FirstAccess(TestCase):
                 response = self.authorized_author.get(
                     reverse(address, args=args)
                 )
-                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_urls_guest_fakepage(self):
         """Ответ 404 на несуществующую страницу"""
         response = self.client.get('/fakepage/')
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_urls_correct_templates(self):
         """Проверка корректности шаблонов"""

@@ -33,42 +33,41 @@ class CorrectTemplateTests(TestCase):
         self.authorized_client.force_login(self.user)
         self.authorized_author = Client()
         self.authorized_author.force_login(self.author)
-        self.template_check = (
-            ('posts:index', None),
-            ('posts:group_list', (self.group.slug,)),
-            ('posts:profile', (self.author,)),
-            ('posts:post_detail', (self.post.id,)),
-        )
+        # self.template_check = (
+        #     ('posts:index', None),
+        #     ('posts:group_list', (self.group.slug,)),
+        #     ('posts:profile', (self.author,)),
+        #     ('posts:post_detail', (self.post.id,)),
+        # )
 
-    def test_post_detail_pages_authorized_uses_correct_template(self):
-        """URL-адреса используют шаблон posts/post_detail.html."""
-        response = self.authorized_client.get(reverse(
-            'posts:post_detail', kwargs={'post_id': '1'})
-        )
-        self.assertTemplateUsed(response, 'posts/post_detail.html')
-
-    def test_post_create_url_exists_at_desired_location(self):
-        """URL-адреса используют шаблон posts/create_post.html."""
-        response = self.authorized_client.get(reverse('posts:post_create'))
-        self.assertTemplateUsed(response, 'posts/create_post.html')
-
-    def test_view_author_posts_edit(self):
-        """URL-адреса для автора используют шаблон posts/create_post.html."""
-        if self.authorized_client == self.user:
-            response = self.authorized_client.get(reverse('posts:post_edit'))
-            self.assertTemplateUsed(response, 'posts/create_post.html')
+    # def test_post_detail_pages_authorized_uses_correct_template(self):
+    #     """URL-адреса используют шаблон posts/post_detail.html."""
+    #     response = self.authorized_client.get(reverse(
+    #         'posts:post_detail', kwargs={'post_id': '1'})
+    #     )
+    #     self.assertTemplateUsed(response, 'posts/post_detail.html')
+    #
+    # def test_post_create_url_exists_at_desired_location(self):
+    #     """URL-адреса используют шаблон posts/create_post.html."""
+    #     response = self.authorized_client.get(reverse('posts:post_create'))
+    #     self.assertTemplateUsed(response, 'posts/create_post.html')
+    #
+    # def test_view_author_posts_edit(self):
+    #     """URL-адреса для автора используют шаблон posts/create_post.html."""
+    #     if self.authorized_client == self.user:
+    #         response = self.authorized_client.get(reverse('posts:post_edit'))
+    #         self.assertTemplateUsed(response, 'posts/create_post.html')
 
     def check_func(self, response, bol=False):
         """Вспомогательная функция для проверки корректного контекста"""
         if bol:
-            self.assertEqual(
-                response.context.get('post').text, 'Тестовая пост 1'
-            )
+            post = response.context.get('post')
         else:
-            first_object = response.context['page_obj'][0]
-            self.assertEqual(first_object.text, 'Тестовая пост 1')
-            self.assertEqual(first_object.author.username, 'auth')
-            self.assertEqual(first_object.group.title, 'Тестовая группа123')
+            post = response.context['page_obj'][0]
+        self.assertEqual(post.text, self.post.text)
+        self.assertEqual(post.author, self.author)
+        self.assertEqual(post.group, self.group)
+        self.assertEqual(post.pub_date, self.post.pub_date)
 
     def test_index_pages_show_correct_context(self):
         """Проверка контекста в index"""
@@ -81,6 +80,8 @@ class CorrectTemplateTests(TestCase):
             'posts:group_list', args=(self.group.slug,))
         )
         self.check_func(response)
+        group_context = response.context['group']
+        self.assertEqual(group_context, self.group)
 
     def test_profile_pages_show_correct_context(self):
         """Проверка контекста в profile"""
@@ -88,12 +89,13 @@ class CorrectTemplateTests(TestCase):
             'posts:profile', args=(self.user.username,))
         )
         self.check_func(response)
+        group_context = response.context['author']
+        self.assertEqual(group_context, self.author)
 
-    #
     def test_post_detail_pages_show_correct_context(self):
         """Проверка контекста в post_detail"""
         response = self.authorized_client.get(reverse(
-            'posts:post_detail', kwargs={'post_id': '1'})
+            'posts:post_detail', args=(self.post.id,))
         )
         self.check_func(response, True)
 
@@ -141,7 +143,7 @@ class CorrectTemplateTests(TestCase):
             'posts:group_list', args=(self.group.slug,))
         )
         self.assertEqual(len(response1.context['page_obj']), settings.ZERO)
-        self.assertEqual(post1.group.slug, self.group.slug)
+        self.assertEqual(post1.group, self.group)
         self.assertEqual(len(response2.context['page_obj']), post_count + 1)
 
 

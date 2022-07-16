@@ -1,5 +1,6 @@
 from http import HTTPStatus
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -80,7 +81,7 @@ class PostFormsTest(TestCase):
             reverse('posts:group_list', args=(self.group.slug,))
         )
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertEqual(len(response.context['page_obj']), post_count - 1)
+        self.assertEqual(len(response.context['page_obj']), settings.ZERO)
 
     def test_anonymous_create_post(self):
         """Создание поста анонимом."""
